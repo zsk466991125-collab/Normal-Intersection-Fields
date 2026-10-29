@@ -1,0 +1,1451 @@
+2026-10-17 18:01:31,971 - mmrotate - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.9.25 (main, Nov  3 2025, 22:33:05) [GCC 11.2.0]
+CUDA available: True
+GPU 0,1,2,3: NVIDIA GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 12.9, V12.9.86
+GCC: gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0
+PyTorch: 1.13.1+cu117
+PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.13.1, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.14.1+cu117
+OpenCV: 4.11.0
+MMCV: 1.7.0
+MMCV Compiler: GCC 9.3
+MMCV CUDA Compiler: 11.7
+MMRotate: 0.3.4+
+------------------------------------------------------------
+
+2026-10-17 18:01:32,825 - mmrotate - INFO - Distributed training: True
+2026-10-17 18:01:33,764 - mmrotate - INFO - Config:
+dataset_type = 'HRSCDataset'
+data_root = '/home/userroot/da_obb/data/HRSC2016/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(type='RResize', img_scale=(800, 800)),
+    dict(
+        type='RRandomFlip',
+        flip_ratio=[0.25, 0.25, 0.25],
+        direction=['horizontal', 'vertical', 'diagonal'],
+        version='le90'),
+    dict(
+        type='PolyRandomRotate',
+        rotate_ratio=0.5,
+        angles_range=180,
+        auto_bound=False,
+        version='le90'),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(800, 800),
+        flip=False,
+        transforms=[
+            dict(type='RResize'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=2,
+    workers_per_gpu=2,
+    train=dict(
+        type='HRSCDataset',
+        classwise=False,
+        ann_file='/home/userroot/da_obb/data/HRSC2016/ImageSets/trainval.txt',
+        ann_subdir=
+        '/home/userroot/da_obb/data/HRSC2016/FullDataSet/Annotations/',
+        img_subdir='/home/userroot/da_obb/data/HRSC2016/FullDataSet/AllImages/',
+        img_prefix='/home/userroot/da_obb/data/HRSC2016/FullDataSet/AllImages/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(type='RResize', img_scale=(800, 800)),
+            dict(
+                type='RRandomFlip',
+                flip_ratio=[0.25, 0.25, 0.25],
+                direction=['horizontal', 'vertical', 'diagonal'],
+                version='le90'),
+            dict(
+                type='PolyRandomRotate',
+                rotate_ratio=0.5,
+                angles_range=180,
+                auto_bound=False,
+                version='le90'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ],
+        version='le90',
+        filter_empty_gt=True),
+    val=dict(
+        type='HRSCDataset',
+        classwise=False,
+        ann_file='/home/userroot/da_obb/data/HRSC2016/ImageSets/test.txt',
+        ann_subdir=
+        '/home/userroot/da_obb/data/HRSC2016/FullDataSet/Annotations/',
+        img_subdir='/home/userroot/da_obb/data/HRSC2016/FullDataSet/AllImages/',
+        img_prefix='/home/userroot/da_obb/data/HRSC2016/FullDataSet/AllImages/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(800, 800),
+                flip=False,
+                transforms=[
+                    dict(type='RResize'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='DefaultFormatBundle'),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ],
+        version='le90',
+        test_mode=True),
+    test=dict(
+        type='HRSCDataset',
+        classwise=False,
+        ann_file='/home/userroot/da_obb/data/HRSC2016/ImageSets/test.txt',
+        ann_subdir=
+        '/home/userroot/da_obb/data/HRSC2016/FullDataSet/Annotations/',
+        img_subdir='/home/userroot/da_obb/data/HRSC2016/FullDataSet/AllImages/',
+        img_prefix='/home/userroot/da_obb/data/HRSC2016/FullDataSet/AllImages/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(800, 800),
+                flip=False,
+                transforms=[
+                    dict(type='RResize'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='DefaultFormatBundle'),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ],
+        version='le90',
+        test_mode=True))
+evaluation = dict(
+    interval=36,
+    metric='mAP',
+    save_best=None,
+    use_07_metric='both',
+    iou_thr=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
+    nproc=2)
+optimizer = dict(
+    type='AdamW', lr=0.0001, betas=(0.9, 0.999), weight_decay=0.05)
+optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.3333333333333333,
+    step=[24, 33])
+runner = dict(type='EpochBasedRunner', max_epochs=36)
+checkpoint_config = dict(interval=1, max_keep_ckpts=2)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+opencv_num_threads = 0
+mp_start_method = 'fork'
+angle_version = 'le90'
+find_unused_parameters = True
+model = dict(
+    type='StripRCNN',
+    backbone=dict(
+        type='StripNet',
+        embed_dims=[64, 128, 320, 512],
+        depths=[2, 2, 4, 2],
+        k1s=[1, 1, 1, 1],
+        k2s=[19, 19, 19, 19],
+        drop_rate=0.1,
+        drop_path_rate=0.1,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='/home/userroot/da_obb/pretrained/strip_s_backbone.pth')
+    ),
+    neck=dict(
+        type='FPN',
+        in_channels=[64, 128, 320, 512],
+        out_channels=256,
+        num_outs=5),
+    rpn_head=dict(
+        type='OrientedRPNHead',
+        in_channels=256,
+        feat_channels=256,
+        version='le90',
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='MidpointOffsetCoder',
+            angle_range='le90',
+            target_means=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0, 0.5, 0.5]),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='NIFV142OrientedStandardRoIHead',
+        bbox_roi_extractor=dict(
+            type='RotatedSingleRoIExtractor',
+            roi_layer=dict(
+                type='RoIAlignRotated',
+                out_size=7,
+                sample_num=2,
+                clockwise=True),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=dict(
+            type='StripHead',
+            in_channels=256,
+            fc_out_channels=1024,
+            roi_feat_size=7,
+            num_classes=1,
+            bbox_coder=dict(
+                type='DeltaXYWHAOBBoxCoder',
+                angle_range='le90',
+                norm_factor=None,
+                edge_swap=True,
+                proj_xy=True,
+                target_means=(0.0, 0.0, 0.0, 0.0, 0.0),
+                target_stds=(0.1, 0.1, 0.2, 0.2, 0.1)),
+            reg_class_agnostic=True,
+            loss_cls=dict(
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+            loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0)),
+        nif_cfg=dict(
+            num_points=5,
+            sample_extent=0.75,
+            strip_normal=9,
+            strip_tangent=3,
+            in_channels=256,
+            projection_channels=64,
+            hidden_channels=64,
+            solver='ols',
+            obs_loss_weight=1.0,
+            ref_loss_weight=1.0,
+            chunk_size=64,
+            aligned=True,
+            with_checkpoint=True,
+            min_size=0.001,
+            sampling=dict(
+                mode='stratified',
+                max_pos_per_img=128,
+                iou_bins=[0.5, 0.65, 0.8, 0.9, 1.01],
+                exclude_gt=True,
+                include_gt_fallback=True),
+            preserve_normal_position=True,
+            reliability_enabled=True,
+            reliability_prior=0.8,
+            reliability_min=0.05,
+            reliability_loss_weight=0.05,
+            reliability_error_scale=0.25,
+            reliability_power=1.5)),
+    train_cfg=dict(
+        rpn=dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.3,
+                min_pos_iou=0.3,
+                match_low_quality=True,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=256,
+                pos_fraction=0.5,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=False),
+            allowed_border=0,
+            pos_weight=-1,
+            debug=False),
+        rpn_proposal=dict(
+            nms_pre=2000,
+            max_per_img=2000,
+            nms=dict(type='nms', iou_threshold=0.8),
+            min_bbox_size=0),
+        rcnn=dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=False,
+                iou_calculator=dict(type='RBboxOverlaps2D'),
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RRandomSampler',
+                num=512,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False)),
+    test_cfg=dict(
+        rpn=dict(
+            nms_pre=2000,
+            max_per_img=2000,
+            nms=dict(type='nms', iou_threshold=0.8),
+            min_bbox_size=0),
+        rcnn=dict(
+            nms_pre=2000,
+            min_bbox_size=0,
+            score_thr=0.05,
+            nms=dict(iou_thr=0.1),
+            max_per_img=2000)))
+work_dir = '/home/userroot/da_obb/work_dirs/nif_strip_rcnn_s_v142_hrsc_36e_trainval_lr1e_4_4gpu'
+auto_resume = False
+gpu_ids = range(0, 4)
+
+2026-10-17 18:01:33,764 - mmrotate - INFO - Set random seed to 0, deterministic: False
+2026-10-17 18:01:34,299 - mmrotate - INFO - initialize StripNet with init_cfg {'type': 'Pretrained', 'checkpoint': '/home/userroot/da_obb/pretrained/strip_s_backbone.pth'}
+2026-10-17 18:01:34,405 - mmrotate - INFO - initialize FPN with init_cfg {'type': 'Xavier', 'layer': 'Conv2d', 'distribution': 'uniform'}
+2026-10-17 18:01:34,427 - mmrotate - INFO - initialize OrientedRPNHead with init_cfg {'type': 'Normal', 'layer': 'Conv2d', 'std': 0.01}
+2026-10-17 18:01:34,433 - mmrotate - INFO - initialize StripHead with init_cfg [{'type': 'Normal', 'std': 0.01, 'override': {'name': 'fc_cls'}}, {'type': 'Normal', 'std': 0.001, 'override': {'name': 'fc_reg'}}, {'type': 'Xavier', 'layer': 'Linear', 'override': [{'name': 'shared_fcs'}, {'name': 'cls_fcs'}, {'name': 'reg_xy_wh_fcs'}, {'name': 'reg_theta_fcs'}]}]
+Name of parameter - Initialization information
+
+backbone.patch_embed1.proj.weight - torch.Size([64, 3, 7, 7]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed1.proj.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed1.norm.weight - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed1.norm.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.layer_scale_1 - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.layer_scale_2 - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.norm1.weight - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.norm1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.norm2.weight - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.norm2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.proj_1.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.proj_1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.conv0.weight - torch.Size([64, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.conv0.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([64, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([64, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.conv1.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.spatial_gating_unit.conv1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.proj_2.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.attn.proj_2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.mlp.fc1.weight - torch.Size([512, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.mlp.fc1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.mlp.dwconv.dwconv.weight - torch.Size([512, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.mlp.dwconv.dwconv.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.mlp.fc2.weight - torch.Size([64, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.0.mlp.fc2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.layer_scale_1 - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.layer_scale_2 - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.norm1.weight - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.norm1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.norm2.weight - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.norm2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.proj_1.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.proj_1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.conv0.weight - torch.Size([64, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.conv0.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([64, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([64, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.conv1.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.spatial_gating_unit.conv1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.proj_2.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.attn.proj_2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.mlp.fc1.weight - torch.Size([512, 64, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.mlp.fc1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.mlp.dwconv.dwconv.weight - torch.Size([512, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.mlp.dwconv.dwconv.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.mlp.fc2.weight - torch.Size([64, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block1.1.mlp.fc2.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm1.weight - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm1.bias - torch.Size([64]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed2.proj.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed2.proj.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed2.norm.weight - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed2.norm.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.layer_scale_1 - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.layer_scale_2 - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.norm1.weight - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.norm1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.norm2.weight - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.norm2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.proj_1.weight - torch.Size([128, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.proj_1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.conv0.weight - torch.Size([128, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.conv0.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([128, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([128, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.conv1.weight - torch.Size([128, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.spatial_gating_unit.conv1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.proj_2.weight - torch.Size([128, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.attn.proj_2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.mlp.fc1.weight - torch.Size([1024, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.mlp.fc1.bias - torch.Size([1024]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.mlp.dwconv.dwconv.weight - torch.Size([1024, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.mlp.dwconv.dwconv.bias - torch.Size([1024]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.mlp.fc2.weight - torch.Size([128, 1024, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.0.mlp.fc2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.layer_scale_1 - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.layer_scale_2 - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.norm1.weight - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.norm1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.norm2.weight - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.norm2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.proj_1.weight - torch.Size([128, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.proj_1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.conv0.weight - torch.Size([128, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.conv0.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([128, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([128, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.conv1.weight - torch.Size([128, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.spatial_gating_unit.conv1.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.proj_2.weight - torch.Size([128, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.attn.proj_2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.mlp.fc1.weight - torch.Size([1024, 128, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.mlp.fc1.bias - torch.Size([1024]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.mlp.dwconv.dwconv.weight - torch.Size([1024, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.mlp.dwconv.dwconv.bias - torch.Size([1024]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.mlp.fc2.weight - torch.Size([128, 1024, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block2.1.mlp.fc2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm2.weight - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm2.bias - torch.Size([128]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed3.proj.weight - torch.Size([320, 128, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed3.proj.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed3.norm.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed3.norm.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.layer_scale_1 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.layer_scale_2 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.proj_1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.proj_1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.conv0.weight - torch.Size([320, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.conv0.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([320, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([320, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.conv1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.spatial_gating_unit.conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.proj_2.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.attn.proj_2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.mlp.fc1.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.mlp.fc1.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.mlp.dwconv.dwconv.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.mlp.dwconv.dwconv.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.mlp.fc2.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.0.mlp.fc2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.layer_scale_1 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.layer_scale_2 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.proj_1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.proj_1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.conv0.weight - torch.Size([320, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.conv0.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([320, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([320, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.conv1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.spatial_gating_unit.conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.proj_2.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.attn.proj_2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.mlp.fc1.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.mlp.fc1.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.mlp.dwconv.dwconv.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.mlp.dwconv.dwconv.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.mlp.fc2.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.1.mlp.fc2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.layer_scale_1 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.layer_scale_2 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.proj_1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.proj_1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.conv0.weight - torch.Size([320, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.conv0.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([320, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([320, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.conv1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.spatial_gating_unit.conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.proj_2.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.attn.proj_2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.mlp.fc1.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.mlp.fc1.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.mlp.dwconv.dwconv.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.mlp.dwconv.dwconv.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.mlp.fc2.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.2.mlp.fc2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.layer_scale_1 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.layer_scale_2 - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.proj_1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.proj_1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.conv0.weight - torch.Size([320, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.conv0.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([320, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([320, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.conv1.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.spatial_gating_unit.conv1.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.proj_2.weight - torch.Size([320, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.attn.proj_2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.mlp.fc1.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.mlp.fc1.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.mlp.dwconv.dwconv.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.mlp.dwconv.dwconv.bias - torch.Size([1280]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.mlp.fc2.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block3.3.mlp.fc2.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm3.weight - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm3.bias - torch.Size([320]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed4.proj.weight - torch.Size([512, 320, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed4.proj.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed4.norm.weight - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.patch_embed4.norm.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.layer_scale_1 - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.layer_scale_2 - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.norm1.weight - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.norm1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.norm2.weight - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.norm2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.proj_1.weight - torch.Size([512, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.proj_1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.conv0.weight - torch.Size([512, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.conv0.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([512, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([512, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.conv1.weight - torch.Size([512, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.spatial_gating_unit.conv1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.proj_2.weight - torch.Size([512, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.attn.proj_2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.mlp.fc1.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.mlp.fc1.bias - torch.Size([2048]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.mlp.dwconv.dwconv.weight - torch.Size([2048, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.mlp.dwconv.dwconv.bias - torch.Size([2048]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.mlp.fc2.weight - torch.Size([512, 2048, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.0.mlp.fc2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.layer_scale_1 - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.layer_scale_2 - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.norm1.weight - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.norm1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.norm2.weight - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.norm2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.proj_1.weight - torch.Size([512, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.proj_1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.conv0.weight - torch.Size([512, 1, 5, 5]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.conv0.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.strip_conv1.weight - torch.Size([512, 1, 1, 19]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.strip_conv1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.strip_conv2.weight - torch.Size([512, 1, 19, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.strip_conv2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.conv1.weight - torch.Size([512, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.spatial_gating_unit.conv1.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.proj_2.weight - torch.Size([512, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.attn.proj_2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.mlp.fc1.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.mlp.fc1.bias - torch.Size([2048]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.mlp.dwconv.dwconv.weight - torch.Size([2048, 1, 3, 3]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.mlp.dwconv.dwconv.bias - torch.Size([2048]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.mlp.fc2.weight - torch.Size([512, 2048, 1, 1]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.block4.1.mlp.fc2.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm4.weight - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+backbone.norm4.bias - torch.Size([512]): 
+PretrainedInit: load from /home/userroot/da_obb/pretrained/strip_s_backbone.pth 
+
+neck.lateral_convs.0.conv.weight - torch.Size([256, 64, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.0.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+neck.lateral_convs.1.conv.weight - torch.Size([256, 128, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.1.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+neck.lateral_convs.2.conv.weight - torch.Size([256, 320, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.2.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+neck.lateral_convs.3.conv.weight - torch.Size([256, 512, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.3.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+neck.fpn_convs.0.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.0.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+neck.fpn_convs.1.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.1.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+neck.fpn_convs.2.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.2.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+neck.fpn_convs.3.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.3.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+rpn_head.rpn_conv.weight - torch.Size([256, 256, 3, 3]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_conv.bias - torch.Size([256]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_cls.weight - torch.Size([3, 256, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_cls.bias - torch.Size([3]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_reg.weight - torch.Size([18, 256, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_reg.bias - torch.Size([18]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.fc_cls.weight - torch.Size([2, 1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.fc_cls.bias - torch.Size([2]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.fc_reg.weight - torch.Size([5, 12544]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.fc_reg.bias - torch.Size([5]): 
+NormalInit: mean=0, std=0.001, bias=0 
+
+roi_head.bbox_head.cls_fcs.0.weight - torch.Size([1024, 12544]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.cls_fcs.0.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.cls_fcs.1.weight - torch.Size([1024, 1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.cls_fcs.1.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.reg_xy_wh_convs.0.conv.weight - torch.Size([256, 256, 3, 3]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.0.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.conv0.weight - torch.Size([256, 1, 5, 5]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.conv0.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.strip_conv1.weight - torch.Size([256, 1, 1, 19]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.strip_conv1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.strip_conv2.weight - torch.Size([256, 1, 19, 1]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.strip_conv2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.conv1.weight - torch.Size([256, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_xy_wh_convs.1.conv1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.bbox_head.reg_theta_fcs.0.weight - torch.Size([1024, 12544]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.reg_theta_fcs.0.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.reg_theta_fcs.1.weight - torch.Size([1024, 1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.reg_theta_fcs.1.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.fc_reg_xy_wh.weight - torch.Size([4, 12544]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.fc_reg_xy_wh.bias - torch.Size([4]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.fc_reg_theta.weight - torch.Size([1, 1024]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.bbox_head.fc_reg_theta.bias - torch.Size([1]): 
+XavierInit: gain=1, distribution=normal, bias=0 
+
+roi_head.nif_head.feature_projection.weight - torch.Size([64, 256, 1, 1]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.feature_projection.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.visual.0.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.visual.0.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.visual.2.weight - torch.Size([64, 64, 3, 3]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.visual.2.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.normal_position.0.weight - torch.Size([64, 576]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.normal_position.0.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.predictor.0.weight - torch.Size([64, 71]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.predictor.0.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.predictor.2.weight - torch.Size([2, 64]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+
+roi_head.nif_head.predictor.2.bias - torch.Size([2]): 
+The value is the same before and after calling `init_weights` of StripRCNN  
+2026-10-17 18:01:37,588 - mmrotate - INFO - Start running, host: root@userroot-W580-G20, work_dir: /home/userroot/da_obb/work_dirs/nif_strip_rcnn_s_v142_hrsc_36e_trainval_lr1e_4_4gpu
+2026-10-17 18:01:37,589 - mmrotate - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2026-10-17 18:01:37,596 - mmrotate - INFO - workflow: [('train', 1)], max: 36 epochs
+2026-10-17 18:01:37,596 - mmrotate - INFO - Checkpoints will be saved to /home/userroot/da_obb/work_dirs/nif_strip_rcnn_s_v142_hrsc_36e_trainval_lr1e_4_4gpu by HardDiskBackend.
+2026-10-17 18:02:01,689 - mmrotate - INFO - Epoch [1][50/78]	lr: 3.987e-05, eta: 0:22:08, time: 0.482, data_time: 0.048, memory: 5274, loss_rpn_cls: 0.4417, loss_rpn_bbox: 0.0906, loss_cls: 0.0624, acc: 98.5869, loss_bbox: 0.0055, loss_nif_obs: 0.0093, loss_nif_ref: 0.2916, loss_nif_reliability: 0.0045, nif_window_coverage: 0.9106, nif_full_window_coverage: 0.6209, nif_segment_hit: 0.8442, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9517, nif_compat_mse: 0.0000, nif_iou_before: 0.7073, nif_iou_after: 0.7084, nif_positive_count: 2.8125, nif_reliability_mean: 0.8006, nif_reliability_target: 0.8175, nif_reliability_min: 0.8005, loss: 0.9056, grad_norm: 3.3129
+2026-10-17 18:02:13,149 - mmrotate - INFO - Saving checkpoint at 1 epochs
+2026-10-17 18:02:36,995 - mmrotate - INFO - Epoch [2][50/78]	lr: 5.027e-05, eta: 0:16:13, time: 0.448, data_time: 0.049, memory: 5275, loss_rpn_cls: 0.0665, loss_rpn_bbox: 0.0806, loss_cls: 0.0225, acc: 99.4810, loss_bbox: 0.0029, loss_nif_obs: 0.0096, loss_nif_ref: 0.1860, loss_nif_reliability: 0.0045, nif_window_coverage: 0.9645, nif_full_window_coverage: 0.8360, nif_segment_hit: 0.9218, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.0103, nif_compat_mse: 0.0000, nif_iou_before: 0.8132, nif_iou_after: 0.8140, nif_positive_count: 2.6625, nif_reliability_mean: 0.8034, nif_reliability_target: 0.8802, nif_reliability_min: 0.8028, loss: 0.3728, grad_norm: 1.5210
+2026-10-17 18:02:48,355 - mmrotate - INFO - Saving checkpoint at 2 epochs
+2026-10-17 18:03:14,616 - mmrotate - INFO - Epoch [3][50/78]	lr: 6.067e-05, eta: 0:15:00, time: 0.495, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0469, loss_rpn_bbox: 0.0802, loss_cls: 0.0261, acc: 99.3628, loss_bbox: 0.0091, loss_nif_obs: 0.0284, loss_nif_ref: 0.2570, loss_nif_reliability: 0.0062, nif_window_coverage: 0.9192, nif_full_window_coverage: 0.6376, nif_segment_hit: 0.9019, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.3982, nif_compat_mse: 0.0000, nif_iou_before: 0.7382, nif_iou_after: 0.7430, nif_positive_count: 3.0225, nif_reliability_mean: 0.8102, nif_reliability_target: 0.7970, nif_reliability_min: 0.8075, loss: 0.4538, grad_norm: 1.7505
+2026-10-17 18:03:27,268 - mmrotate - INFO - Saving checkpoint at 3 epochs
+2026-10-17 18:03:54,228 - mmrotate - INFO - Epoch [4][50/78]	lr: 7.107e-05, eta: 0:14:18, time: 0.507, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0346, loss_rpn_bbox: 0.0665, loss_cls: 0.0350, acc: 99.0908, loss_bbox: 0.0194, loss_nif_obs: 0.0346, loss_nif_ref: 0.3183, loss_nif_reliability: 0.0071, nif_window_coverage: 0.8867, nif_full_window_coverage: 0.4438, nif_segment_hit: 0.8746, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.7253, nif_compat_mse: 0.0002, nif_iou_before: 0.6635, nif_iou_after: 0.6817, nif_positive_count: 4.3300, nif_reliability_mean: 0.8199, nif_reliability_target: 0.7250, nif_reliability_min: 0.8118, loss: 0.5155, grad_norm: 2.5934
+2026-10-17 18:04:07,235 - mmrotate - INFO - Saving checkpoint at 4 epochs
+2026-10-17 18:04:34,200 - mmrotate - INFO - Epoch [5][50/78]	lr: 8.147e-05, eta: 0:13:44, time: 0.509, data_time: 0.049, memory: 5275, loss_rpn_cls: 0.0265, loss_rpn_bbox: 0.0583, loss_cls: 0.0319, acc: 98.9795, loss_bbox: 0.0218, loss_nif_obs: 0.0230, loss_nif_ref: 0.2729, loss_nif_reliability: 0.0057, nif_window_coverage: 0.9194, nif_full_window_coverage: 0.5280, nif_segment_hit: 0.9000, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.7312, nif_compat_mse: 0.0011, nif_iou_before: 0.6802, nif_iou_after: 0.7271, nif_positive_count: 5.8750, nif_reliability_mean: 0.8152, nif_reliability_target: 0.7643, nif_reliability_min: 0.8082, loss: 0.4401, grad_norm: 4.1251
+2026-10-17 18:04:47,249 - mmrotate - INFO - Saving checkpoint at 5 epochs
+2026-10-17 18:05:11,593 - mmrotate - INFO - Epoch [6][50/78]	lr: 9.187e-05, eta: 0:12:59, time: 0.455, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0240, loss_rpn_bbox: 0.0589, loss_cls: 0.0368, acc: 98.6958, loss_bbox: 0.0281, loss_nif_obs: 0.0148, loss_nif_ref: 0.2191, loss_nif_reliability: 0.0048, nif_window_coverage: 0.9485, nif_full_window_coverage: 0.6629, nif_segment_hit: 0.9254, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.5472, nif_compat_mse: 0.0013, nif_iou_before: 0.7132, nif_iou_after: 0.7809, nif_positive_count: 9.8875, nif_reliability_mean: 0.8132, nif_reliability_target: 0.7994, nif_reliability_min: 0.8076, loss: 0.3865, grad_norm: 4.2768
+2026-10-17 18:05:23,175 - mmrotate - INFO - Saving checkpoint at 6 epochs
+2026-10-17 18:05:49,982 - mmrotate - INFO - Epoch [7][50/78]	lr: 1.000e-04, eta: 0:12:31, time: 0.505, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0201, loss_rpn_bbox: 0.0616, loss_cls: 0.0386, acc: 98.5635, loss_bbox: 0.0280, loss_nif_obs: 0.0117, loss_nif_ref: 0.1916, loss_nif_reliability: 0.0043, nif_window_coverage: 0.9614, nif_full_window_coverage: 0.7145, nif_segment_hit: 0.9303, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.3396, nif_compat_mse: 0.0012, nif_iou_before: 0.7348, nif_iou_after: 0.8084, nif_positive_count: 11.8025, nif_reliability_mean: 0.8220, nif_reliability_target: 0.8235, nif_reliability_min: 0.8124, loss: 0.3560, grad_norm: 4.1673
+2026-10-17 18:06:02,878 - mmrotate - INFO - Saving checkpoint at 7 epochs
+2026-10-17 18:06:29,794 - mmrotate - INFO - Epoch [8][50/78]	lr: 1.000e-04, eta: 0:12:04, time: 0.504, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0164, loss_rpn_bbox: 0.0444, loss_cls: 0.0345, acc: 98.6826, loss_bbox: 0.0265, loss_nif_obs: 0.0093, loss_nif_ref: 0.1760, loss_nif_reliability: 0.0038, nif_window_coverage: 0.9741, nif_full_window_coverage: 0.8071, nif_segment_hit: 0.9453, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.3240, nif_compat_mse: 0.0010, nif_iou_before: 0.7589, nif_iou_after: 0.8240, nif_positive_count: 13.6950, nif_reliability_mean: 0.8302, nif_reliability_target: 0.8372, nif_reliability_min: 0.8169, loss: 0.3109, grad_norm: 4.2505
+2026-10-17 18:06:42,805 - mmrotate - INFO - Saving checkpoint at 8 epochs
+2026-10-17 18:07:07,187 - mmrotate - INFO - Epoch [9][50/78]	lr: 1.000e-04, eta: 0:11:30, time: 0.457, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0146, loss_rpn_bbox: 0.0487, loss_cls: 0.0404, acc: 98.4531, loss_bbox: 0.0346, loss_nif_obs: 0.0074, loss_nif_ref: 0.1571, loss_nif_reliability: 0.0035, nif_window_coverage: 0.9772, nif_full_window_coverage: 0.8210, nif_segment_hit: 0.9466, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.1739, nif_compat_mse: 0.0010, nif_iou_before: 0.7684, nif_iou_after: 0.8429, nif_positive_count: 18.2250, nif_reliability_mean: 0.8400, nif_reliability_target: 0.8543, nif_reliability_min: 0.8222, loss: 0.3062, grad_norm: 3.8334
+2026-10-17 18:07:18,729 - mmrotate - INFO - Saving checkpoint at 9 epochs
+2026-10-17 18:07:45,550 - mmrotate - INFO - Epoch [10][50/78]	lr: 1.000e-04, eta: 0:11:05, time: 0.505, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0120, loss_rpn_bbox: 0.0442, loss_cls: 0.0374, acc: 98.5210, loss_bbox: 0.0324, loss_nif_obs: 0.0066, loss_nif_ref: 0.1527, loss_nif_reliability: 0.0033, nif_window_coverage: 0.9834, nif_full_window_coverage: 0.8758, nif_segment_hit: 0.9558, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.0296, nif_compat_mse: 0.0009, nif_iou_before: 0.7794, nif_iou_after: 0.8473, nif_positive_count: 19.3775, nif_reliability_mean: 0.8511, nif_reliability_target: 0.8572, nif_reliability_min: 0.8282, loss: 0.2886, grad_norm: 3.7560
+2026-10-17 18:07:58,462 - mmrotate - INFO - Saving checkpoint at 10 epochs
+2026-10-17 18:08:25,318 - mmrotate - INFO - Epoch [11][50/78]	lr: 1.000e-04, eta: 0:10:40, time: 0.505, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0133, loss_rpn_bbox: 0.0362, loss_cls: 0.0350, acc: 98.6113, loss_bbox: 0.0269, loss_nif_obs: 0.0048, loss_nif_ref: 0.1415, loss_nif_reliability: 0.0029, nif_window_coverage: 0.9867, nif_full_window_coverage: 0.8961, nif_segment_hit: 0.9614, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.1797, nif_compat_mse: 0.0008, nif_iou_before: 0.7960, nif_iou_after: 0.8585, nif_positive_count: 18.8225, nif_reliability_mean: 0.8578, nif_reliability_target: 0.8703, nif_reliability_min: 0.8323, loss: 0.2606, grad_norm: 3.1512
+2026-10-17 18:08:38,635 - mmrotate - INFO - Saving checkpoint at 11 epochs
+2026-10-17 18:09:03,129 - mmrotate - INFO - Epoch [12][50/78]	lr: 1.000e-04, eta: 0:10:10, time: 0.459, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0104, loss_rpn_bbox: 0.0348, loss_cls: 0.0412, acc: 98.3809, loss_bbox: 0.0313, loss_nif_obs: 0.0056, loss_nif_ref: 0.1373, loss_nif_reliability: 0.0029, nif_window_coverage: 0.9883, nif_full_window_coverage: 0.9085, nif_segment_hit: 0.9634, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.1348, nif_compat_mse: 0.0008, nif_iou_before: 0.8004, nif_iou_after: 0.8627, nif_positive_count: 23.9200, nif_reliability_mean: 0.8626, nif_reliability_target: 0.8708, nif_reliability_min: 0.8350, loss: 0.2634, grad_norm: 3.4128
+2026-10-17 18:09:15,916 - mmrotate - INFO - Saving checkpoint at 12 epochs
+2026-10-17 18:09:40,688 - mmrotate - INFO - Epoch [13][50/78]	lr: 1.000e-04, eta: 0:09:41, time: 0.464, data_time: 0.049, memory: 5275, loss_rpn_cls: 0.0084, loss_rpn_bbox: 0.0344, loss_cls: 0.0370, acc: 98.5630, loss_bbox: 0.0296, loss_nif_obs: 0.0042, loss_nif_ref: 0.1314, loss_nif_reliability: 0.0026, nif_window_coverage: 0.9905, nif_full_window_coverage: 0.9252, nif_segment_hit: 0.9661, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.1199, nif_compat_mse: 0.0007, nif_iou_before: 0.8095, nif_iou_after: 0.8686, nif_positive_count: 24.4250, nif_reliability_mean: 0.8724, nif_reliability_target: 0.8805, nif_reliability_min: 0.8420, loss: 0.2476, grad_norm: 3.1935
+2026-10-17 18:09:52,341 - mmrotate - INFO - Saving checkpoint at 13 epochs
+2026-10-17 18:10:17,686 - mmrotate - INFO - Epoch [14][50/78]	lr: 1.000e-04, eta: 0:09:14, time: 0.475, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0092, loss_rpn_bbox: 0.0378, loss_cls: 0.0420, acc: 98.3799, loss_bbox: 0.0304, loss_nif_obs: 0.0044, loss_nif_ref: 0.1328, loss_nif_reliability: 0.0025, nif_window_coverage: 0.9913, nif_full_window_coverage: 0.9317, nif_segment_hit: 0.9682, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9379, nif_compat_mse: 0.0006, nif_iou_before: 0.8129, nif_iou_after: 0.8672, nif_positive_count: 26.4925, nif_reliability_mean: 0.8769, nif_reliability_target: 0.8802, nif_reliability_min: 0.8455, loss: 0.2591, grad_norm: 3.6292
+2026-10-17 18:10:29,406 - mmrotate - INFO - Saving checkpoint at 14 epochs
+2026-10-17 18:10:56,273 - mmrotate - INFO - Epoch [15][50/78]	lr: 1.000e-04, eta: 0:08:50, time: 0.506, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0067, loss_rpn_bbox: 0.0286, loss_cls: 0.0407, acc: 98.3691, loss_bbox: 0.0313, loss_nif_obs: 0.0036, loss_nif_ref: 0.1251, loss_nif_reliability: 0.0023, nif_window_coverage: 0.9926, nif_full_window_coverage: 0.9391, nif_segment_hit: 0.9703, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9956, nif_compat_mse: 0.0006, nif_iou_before: 0.8201, nif_iou_after: 0.8749, nif_positive_count: 29.8425, nif_reliability_mean: 0.8816, nif_reliability_target: 0.8868, nif_reliability_min: 0.8487, loss: 0.2383, grad_norm: 3.4568
+2026-10-17 18:11:09,256 - mmrotate - INFO - Saving checkpoint at 15 epochs
+2026-10-17 18:11:36,394 - mmrotate - INFO - Epoch [16][50/78]	lr: 1.000e-04, eta: 0:08:26, time: 0.511, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0080, loss_rpn_bbox: 0.0278, loss_cls: 0.0392, acc: 98.4375, loss_bbox: 0.0298, loss_nif_obs: 0.0035, loss_nif_ref: 0.1244, loss_nif_reliability: 0.0023, nif_window_coverage: 0.9928, nif_full_window_coverage: 0.9437, nif_segment_hit: 0.9711, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.0445, nif_compat_mse: 0.0006, nif_iou_before: 0.8220, nif_iou_after: 0.8756, nif_positive_count: 29.6825, nif_reliability_mean: 0.8860, nif_reliability_target: 0.8880, nif_reliability_min: 0.8513, loss: 0.2349, grad_norm: 2.6377
+2026-10-17 18:11:49,537 - mmrotate - INFO - Saving checkpoint at 16 epochs
+2026-10-17 18:12:16,779 - mmrotate - INFO - Epoch [17][50/78]	lr: 1.000e-04, eta: 0:08:02, time: 0.510, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0084, loss_rpn_bbox: 0.0351, loss_cls: 0.0367, acc: 98.5449, loss_bbox: 0.0289, loss_nif_obs: 0.0033, loss_nif_ref: 0.1215, loss_nif_reliability: 0.0022, nif_window_coverage: 0.9939, nif_full_window_coverage: 0.9516, nif_segment_hit: 0.9732, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.0047, nif_compat_mse: 0.0006, nif_iou_before: 0.8276, nif_iou_after: 0.8785, nif_positive_count: 29.1425, nif_reliability_mean: 0.8905, nif_reliability_target: 0.8918, nif_reliability_min: 0.8540, loss: 0.2359, grad_norm: 3.6788
+2026-10-17 18:12:30,002 - mmrotate - INFO - Saving checkpoint at 17 epochs
+2026-10-17 18:12:57,174 - mmrotate - INFO - Epoch [18][50/78]	lr: 1.000e-04, eta: 0:07:38, time: 0.512, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0071, loss_rpn_bbox: 0.0345, loss_cls: 0.0399, acc: 98.4341, loss_bbox: 0.0305, loss_nif_obs: 0.0032, loss_nif_ref: 0.1163, loss_nif_reliability: 0.0022, nif_window_coverage: 0.9946, nif_full_window_coverage: 0.9579, nif_segment_hit: 0.9745, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9395, nif_compat_mse: 0.0006, nif_iou_before: 0.8308, nif_iou_after: 0.8837, nif_positive_count: 33.7650, nif_reliability_mean: 0.8902, nif_reliability_target: 0.8936, nif_reliability_min: 0.8540, loss: 0.2336, grad_norm: 2.6247
+2026-10-17 18:13:10,183 - mmrotate - INFO - Saving checkpoint at 18 epochs
+2026-10-17 18:13:36,308 - mmrotate - INFO - Epoch [19][50/78]	lr: 1.000e-04, eta: 0:07:13, time: 0.490, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0058, loss_rpn_bbox: 0.0309, loss_cls: 0.0379, acc: 98.4829, loss_bbox: 0.0311, loss_nif_obs: 0.0029, loss_nif_ref: 0.1177, loss_nif_reliability: 0.0021, nif_window_coverage: 0.9948, nif_full_window_coverage: 0.9560, nif_segment_hit: 0.9748, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.0489, nif_compat_mse: 0.0006, nif_iou_before: 0.8312, nif_iou_after: 0.8823, nif_positive_count: 34.2000, nif_reliability_mean: 0.8923, nif_reliability_target: 0.8946, nif_reliability_min: 0.8561, loss: 0.2284, grad_norm: 2.9162
+2026-10-17 18:13:49,276 - mmrotate - INFO - Saving checkpoint at 19 epochs
+2026-10-17 18:14:13,913 - mmrotate - INFO - Epoch [20][50/78]	lr: 1.000e-04, eta: 0:06:46, time: 0.462, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0058, loss_rpn_bbox: 0.0241, loss_cls: 0.0400, acc: 98.3887, loss_bbox: 0.0288, loss_nif_obs: 0.0023, loss_nif_ref: 0.1091, loss_nif_reliability: 0.0018, nif_window_coverage: 0.9957, nif_full_window_coverage: 0.9661, nif_segment_hit: 0.9786, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9491, nif_compat_mse: 0.0005, nif_iou_before: 0.8415, nif_iou_after: 0.8909, nif_positive_count: 35.5200, nif_reliability_mean: 0.8969, nif_reliability_target: 0.9026, nif_reliability_min: 0.8600, loss: 0.2121, grad_norm: 3.3757
+2026-10-17 18:14:25,590 - mmrotate - INFO - Saving checkpoint at 20 epochs
+2026-10-17 18:14:52,544 - mmrotate - INFO - Epoch [21][50/78]	lr: 1.000e-04, eta: 0:06:22, time: 0.508, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0061, loss_rpn_bbox: 0.0282, loss_cls: 0.0362, acc: 98.5444, loss_bbox: 0.0281, loss_nif_obs: 0.0028, loss_nif_ref: 0.1134, loss_nif_reliability: 0.0020, nif_window_coverage: 0.9958, nif_full_window_coverage: 0.9669, nif_segment_hit: 0.9773, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9324, nif_compat_mse: 0.0005, nif_iou_before: 0.8374, nif_iou_after: 0.8866, nif_positive_count: 32.5500, nif_reliability_mean: 0.8985, nif_reliability_target: 0.8972, nif_reliability_min: 0.8613, loss: 0.2168, grad_norm: 3.5163
+2026-10-17 18:15:05,553 - mmrotate - INFO - Saving checkpoint at 21 epochs
+2026-10-17 18:15:29,877 - mmrotate - INFO - Epoch [22][50/78]	lr: 1.000e-04, eta: 0:05:55, time: 0.454, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0043, loss_rpn_bbox: 0.0239, loss_cls: 0.0349, acc: 98.6089, loss_bbox: 0.0257, loss_nif_obs: 0.0028, loss_nif_ref: 0.1106, loss_nif_reliability: 0.0018, nif_window_coverage: 0.9956, nif_full_window_coverage: 0.9647, nif_segment_hit: 0.9785, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.0208, nif_compat_mse: 0.0005, nif_iou_before: 0.8422, nif_iou_after: 0.8894, nif_positive_count: 33.4600, nif_reliability_mean: 0.9014, nif_reliability_target: 0.9017, nif_reliability_min: 0.8631, loss: 0.2041, grad_norm: 2.9600
+2026-10-17 18:15:41,597 - mmrotate - INFO - Saving checkpoint at 22 epochs
+2026-10-17 18:16:06,356 - mmrotate - INFO - Epoch [23][50/78]	lr: 1.000e-04, eta: 0:05:30, time: 0.465, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0059, loss_rpn_bbox: 0.0258, loss_cls: 0.0381, acc: 98.4692, loss_bbox: 0.0269, loss_nif_obs: 0.0022, loss_nif_ref: 0.1080, loss_nif_reliability: 0.0018, nif_window_coverage: 0.9971, nif_full_window_coverage: 0.9750, nif_segment_hit: 0.9797, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9962, nif_compat_mse: 0.0005, nif_iou_before: 0.8464, nif_iou_after: 0.8920, nif_positive_count: 36.8550, nif_reliability_mean: 0.9006, nif_reliability_target: 0.9032, nif_reliability_min: 0.8623, loss: 0.2086, grad_norm: 3.6321
+2026-10-17 18:16:18,117 - mmrotate - INFO - Saving checkpoint at 23 epochs
+2026-10-17 18:16:42,699 - mmrotate - INFO - Epoch [24][50/78]	lr: 1.000e-04, eta: 0:05:04, time: 0.460, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0059, loss_rpn_bbox: 0.0250, loss_cls: 0.0334, acc: 98.6392, loss_bbox: 0.0248, loss_nif_obs: 0.0025, loss_nif_ref: 0.1112, loss_nif_reliability: 0.0017, nif_window_coverage: 0.9961, nif_full_window_coverage: 0.9665, nif_segment_hit: 0.9806, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.8561, nif_compat_mse: 0.0004, nif_iou_before: 0.8457, nif_iou_after: 0.8888, nif_positive_count: 33.8500, nif_reliability_mean: 0.9030, nif_reliability_target: 0.9042, nif_reliability_min: 0.8648, loss: 0.2046, grad_norm: 3.7252
+2026-10-17 18:16:54,332 - mmrotate - INFO - Saving checkpoint at 24 epochs
+2026-10-17 18:17:19,235 - mmrotate - INFO - Epoch [25][50/78]	lr: 1.000e-05, eta: 0:04:39, time: 0.467, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0065, loss_rpn_bbox: 0.0210, loss_cls: 0.0338, acc: 98.6646, loss_bbox: 0.0260, loss_nif_obs: 0.0022, loss_nif_ref: 0.1022, loss_nif_reliability: 0.0016, nif_window_coverage: 0.9973, nif_full_window_coverage: 0.9777, nif_segment_hit: 0.9840, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9212, nif_compat_mse: 0.0004, nif_iou_before: 0.8568, nif_iou_after: 0.8978, nif_positive_count: 39.2350, nif_reliability_mean: 0.9026, nif_reliability_target: 0.9087, nif_reliability_min: 0.8648, loss: 0.1933, grad_norm: 2.8672
+2026-10-17 18:17:30,995 - mmrotate - INFO - Saving checkpoint at 25 epochs
+2026-10-17 18:17:58,008 - mmrotate - INFO - Exp name: strip_rcnn_s_fpn_3x_hrsc_le90_nif_v142_faa_trainval_lr1e_4.py
+2026-10-17 18:17:58,008 - mmrotate - INFO - Epoch [26][50/78]	lr: 1.000e-05, eta: 0:04:15, time: 0.509, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0040, loss_rpn_bbox: 0.0259, loss_cls: 0.0325, acc: 98.6870, loss_bbox: 0.0250, loss_nif_obs: 0.0021, loss_nif_ref: 0.1004, loss_nif_reliability: 0.0016, nif_window_coverage: 0.9974, nif_full_window_coverage: 0.9801, nif_segment_hit: 0.9851, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9700, nif_compat_mse: 0.0004, nif_iou_before: 0.8611, nif_iou_after: 0.8996, nif_positive_count: 40.8050, nif_reliability_mean: 0.9040, nif_reliability_target: 0.9106, nif_reliability_min: 0.8657, loss: 0.1916, grad_norm: 2.0464
+2026-10-17 18:18:11,091 - mmrotate - INFO - Saving checkpoint at 26 epochs
+2026-10-17 18:18:37,920 - mmrotate - INFO - Epoch [27][50/78]	lr: 1.000e-05, eta: 0:03:50, time: 0.505, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0043, loss_rpn_bbox: 0.0242, loss_cls: 0.0305, acc: 98.7808, loss_bbox: 0.0242, loss_nif_obs: 0.0019, loss_nif_ref: 0.0979, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9980, nif_full_window_coverage: 0.9839, nif_segment_hit: 0.9858, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9128, nif_compat_mse: 0.0004, nif_iou_before: 0.8634, nif_iou_after: 0.9021, nif_positive_count: 40.6125, nif_reliability_mean: 0.9062, nif_reliability_target: 0.9117, nif_reliability_min: 0.8685, loss: 0.1845, grad_norm: 2.7156
+2026-10-17 18:18:50,874 - mmrotate - INFO - Saving checkpoint at 27 epochs
+2026-10-17 18:19:18,137 - mmrotate - INFO - Epoch [28][50/78]	lr: 1.000e-05, eta: 0:03:26, time: 0.513, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0045, loss_rpn_bbox: 0.0197, loss_cls: 0.0309, acc: 98.7549, loss_bbox: 0.0246, loss_nif_obs: 0.0019, loss_nif_ref: 0.0981, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9979, nif_full_window_coverage: 0.9836, nif_segment_hit: 0.9853, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9347, nif_compat_mse: 0.0004, nif_iou_before: 0.8638, nif_iou_after: 0.9019, nif_positive_count: 40.3325, nif_reliability_mean: 0.9074, nif_reliability_target: 0.9125, nif_reliability_min: 0.8688, loss: 0.1812, grad_norm: 2.3916
+2026-10-17 18:19:31,364 - mmrotate - INFO - Saving checkpoint at 28 epochs
+2026-10-17 18:19:55,944 - mmrotate - INFO - Epoch [29][50/78]	lr: 1.000e-05, eta: 0:03:01, time: 0.461, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0040, loss_rpn_bbox: 0.0218, loss_cls: 0.0296, acc: 98.8408, loss_bbox: 0.0242, loss_nif_obs: 0.0020, loss_nif_ref: 0.0990, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9975, nif_full_window_coverage: 0.9808, nif_segment_hit: 0.9860, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.8419, nif_compat_mse: 0.0004, nif_iou_before: 0.8626, nif_iou_after: 0.9010, nif_positive_count: 41.2875, nif_reliability_mean: 0.9077, nif_reliability_target: 0.9119, nif_reliability_min: 0.8693, loss: 0.1821, grad_norm: 2.4404
+2026-10-17 18:20:07,683 - mmrotate - INFO - Saving checkpoint at 29 epochs
+2026-10-17 18:20:32,300 - mmrotate - INFO - Epoch [30][50/78]	lr: 1.000e-05, eta: 0:02:36, time: 0.461, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0040, loss_rpn_bbox: 0.0170, loss_cls: 0.0303, acc: 98.7954, loss_bbox: 0.0242, loss_nif_obs: 0.0020, loss_nif_ref: 0.0976, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9980, nif_full_window_coverage: 0.9841, nif_segment_hit: 0.9857, nif_size_clip_rate: 0.0000, nif_short_side_stride: 8.0115, nif_compat_mse: 0.0004, nif_iou_before: 0.8649, nif_iou_after: 0.9024, nif_positive_count: 40.8750, nif_reliability_mean: 0.9093, nif_reliability_target: 0.9122, nif_reliability_min: 0.8699, loss: 0.1767, grad_norm: 2.2490
+2026-10-17 18:20:44,066 - mmrotate - INFO - Saving checkpoint at 30 epochs
+2026-10-17 18:21:08,509 - mmrotate - INFO - Epoch [31][50/78]	lr: 1.000e-05, eta: 0:02:11, time: 0.457, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0038, loss_rpn_bbox: 0.0188, loss_cls: 0.0298, acc: 98.8018, loss_bbox: 0.0220, loss_nif_obs: 0.0021, loss_nif_ref: 0.0974, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9979, nif_full_window_coverage: 0.9833, nif_segment_hit: 0.9864, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9446, nif_compat_mse: 0.0004, nif_iou_before: 0.8651, nif_iou_after: 0.9026, nif_positive_count: 37.8325, nif_reliability_mean: 0.9095, nif_reliability_target: 0.9114, nif_reliability_min: 0.8701, loss: 0.1754, grad_norm: 2.2394
+2026-10-17 18:21:20,367 - mmrotate - INFO - Saving checkpoint at 31 epochs
+2026-10-17 18:21:44,832 - mmrotate - INFO - Epoch [32][50/78]	lr: 1.000e-05, eta: 0:01:46, time: 0.459, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0047, loss_rpn_bbox: 0.0208, loss_cls: 0.0312, acc: 98.7241, loss_bbox: 0.0244, loss_nif_obs: 0.0020, loss_nif_ref: 0.0990, loss_nif_reliability: 0.0016, nif_window_coverage: 0.9976, nif_full_window_coverage: 0.9817, nif_segment_hit: 0.9864, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.8971, nif_compat_mse: 0.0004, nif_iou_before: 0.8636, nif_iou_after: 0.9010, nif_positive_count: 40.5625, nif_reliability_mean: 0.9105, nif_reliability_target: 0.9104, nif_reliability_min: 0.8713, loss: 0.1837, grad_norm: 2.7567
+2026-10-17 18:21:56,414 - mmrotate - INFO - Saving checkpoint at 32 epochs
+2026-10-17 18:22:20,805 - mmrotate - INFO - Epoch [33][50/78]	lr: 1.000e-05, eta: 0:01:22, time: 0.457, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0037, loss_rpn_bbox: 0.0184, loss_cls: 0.0309, acc: 98.7534, loss_bbox: 0.0238, loss_nif_obs: 0.0021, loss_nif_ref: 0.1000, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9975, nif_full_window_coverage: 0.9823, nif_segment_hit: 0.9854, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.8247, nif_compat_mse: 0.0004, nif_iou_before: 0.8632, nif_iou_after: 0.9000, nif_positive_count: 39.9425, nif_reliability_mean: 0.9116, nif_reliability_target: 0.9109, nif_reliability_min: 0.8722, loss: 0.1805, grad_norm: 2.6788
+2026-10-17 18:22:32,480 - mmrotate - INFO - Saving checkpoint at 33 epochs
+2026-10-17 18:22:59,334 - mmrotate - INFO - Epoch [34][50/78]	lr: 1.000e-06, eta: 0:00:57, time: 0.506, data_time: 0.048, memory: 5275, loss_rpn_cls: 0.0035, loss_rpn_bbox: 0.0192, loss_cls: 0.0308, acc: 98.7749, loss_bbox: 0.0241, loss_nif_obs: 0.0020, loss_nif_ref: 0.0986, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9974, nif_full_window_coverage: 0.9798, nif_segment_hit: 0.9844, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.9354, nif_compat_mse: 0.0004, nif_iou_before: 0.8636, nif_iou_after: 0.9014, nif_positive_count: 40.9200, nif_reliability_mean: 0.9112, nif_reliability_target: 0.9111, nif_reliability_min: 0.8719, loss: 0.1796, grad_norm: 2.3784
+2026-10-17 18:23:12,408 - mmrotate - INFO - Saving checkpoint at 34 epochs
+2026-10-17 18:23:39,835 - mmrotate - INFO - Epoch [35][50/78]	lr: 1.000e-06, eta: 0:00:33, time: 0.514, data_time: 0.049, memory: 5275, loss_rpn_cls: 0.0037, loss_rpn_bbox: 0.0240, loss_cls: 0.0303, acc: 98.7627, loss_bbox: 0.0245, loss_nif_obs: 0.0018, loss_nif_ref: 0.0998, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9979, nif_full_window_coverage: 0.9820, nif_segment_hit: 0.9853, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.8941, nif_compat_mse: 0.0004, nif_iou_before: 0.8645, nif_iou_after: 0.9002, nif_positive_count: 42.2650, nif_reliability_mean: 0.9121, nif_reliability_target: 0.9101, nif_reliability_min: 0.8724, loss: 0.1857, grad_norm: 2.5793
+2026-10-17 18:23:52,981 - mmrotate - INFO - Saving checkpoint at 35 epochs
+2026-10-17 18:24:17,715 - mmrotate - INFO - Epoch [36][50/78]	lr: 1.000e-06, eta: 0:00:08, time: 0.463, data_time: 0.049, memory: 5275, loss_rpn_cls: 0.0033, loss_rpn_bbox: 0.0150, loss_cls: 0.0303, acc: 98.7427, loss_bbox: 0.0244, loss_nif_obs: 0.0020, loss_nif_ref: 0.0991, loss_nif_reliability: 0.0015, nif_window_coverage: 0.9979, nif_full_window_coverage: 0.9845, nif_segment_hit: 0.9859, nif_size_clip_rate: 0.0000, nif_short_side_stride: 7.8407, nif_compat_mse: 0.0004, nif_iou_before: 0.8635, nif_iou_after: 0.9009, nif_positive_count: 41.3900, nif_reliability_mean: 0.9118, nif_reliability_target: 0.9115, nif_reliability_min: 0.8724, loss: 0.1757, grad_norm: 2.5595
+2026-10-17 18:24:29,652 - mmrotate - INFO - Saving checkpoint at 36 epochs

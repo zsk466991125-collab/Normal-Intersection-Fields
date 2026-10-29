@@ -1,0 +1,15 @@
+numpy>=1.23,<2
+opencv-python>=4.6,<4.12
+Pillow
+Shapely
+terminaltables
+mmdet==2.28.2
+e2cnn
+timm>=0.6.13,<2
+einops
+scipy
+matplotlib
+pycocotools
+six
+tqdm
+yapf==0.40.1

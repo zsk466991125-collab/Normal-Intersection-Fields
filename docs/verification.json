@@ -1,0 +1,386 @@
+{
+  "lsk": {
+    "model": "lsk",
+    "strict_load": true,
+    "detections": 14,
+    "finite": true,
+    "loss_finite": true,
+    "nif_grad_nonzero": true,
+    "frozen": true,
+    "carrier_grad_none": true,
+    "carrier_buffers_unchanged": true,
+    "nif_updated": true
+  },
+  "pki": {
+    "model": "pki",
+    "strict_load": true,
+    "detections": 10,
+    "finite": true,
+    "loss_finite": true,
+    "nif_grad_nonzero": true,
+    "frozen": true,
+    "carrier_grad_none": true,
+    "carrier_buffers_unchanged": true,
+    "nif_updated": true
+  },
+  "strip": {
+    "model": "strip",
+    "strict_load": true,
+    "detections": 10,
+    "finite": true,
+    "loss_finite": true,
+    "nif_grad_nonzero": true,
+    "frozen": false
+  },
+  "orcnn": {
+    "model": "orcnn",
+    "strict_load": true,
+    "detections": 11,
+    "finite": true,
+    "loss_finite": true,
+    "nif_grad_nonzero": true,
+    "frozen": false
+  },
+  "o2": {
+    "strict_carrier_load": true,
+    "new_nif_keys": 12,
+    "detections": 300,
+    "loss_finite": true,
+    "nif_grad_nonzero": true,
+    "carrier_grad_none": true
+  },
+  "yolo": {
+    "portable_checkpoint": true,
+    "half_inference": true,
+    "loss_finite": true,
+    "nif_grad_nonzero": true,
+    "carrier_grad_none": true
+  },
+  "ddp": {
+    "world_size": 4,
+    "per_gpu_batch": 2,
+    "iterations": 1,
+    "carrier_tensors_unchanged": true,
+    "carrier_entries": 411
+  },
+  "numerical_parity": {
+    "field": 0.0,
+    "reliability": 0.0,
+    "boxes": 0.0,
+    "loss": 0.0,
+    "prediction_shapes_equal": true,
+    "prediction_max_error": 0.0
+  },
+  "configs": [
+    {
+      "config": "configs/baseline/dior/lsknet_s.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 30982187,
+      "trainable": 30982187
+    },
+    {
+      "config": "configs/baseline/dior/orcnn_r50.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 41370223,
+      "trainable": 41144879
+    },
+    {
+      "config": "configs/baseline/dior/pkinet_v2_s.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 30732015,
+      "trainable": 30732015
+    },
+    {
+      "config": "configs/baseline/dior/strip_rcnn_s.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 45140468,
+      "trainable": 45140468
+    },
+    {
+      "config": "configs/baseline/dota/lsknet_s.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 30977062,
+      "trainable": 30977062
+    },
+    {
+      "config": "configs/baseline/dota/orcnn_r50.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 41365098,
+      "trainable": 41139754
+    },
+    {
+      "config": "configs/baseline/dota/pkinet_v2_s.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 30726890,
+      "trainable": 30726890
+    },
+    {
+      "config": "configs/baseline/dota/strip_rcnn_s.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 45135343,
+      "trainable": 45135343
+    },
+    {
+      "config": "configs/baseline/fair/lsknet_s.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 30999612,
+      "trainable": 30999612
+    },
+    {
+      "config": "configs/baseline/fair/orcnn_r50.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 41387648,
+      "trainable": 41162304
+    },
+    {
+      "config": "configs/baseline/fair/pkinet_v2_s.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 30749440,
+      "trainable": 30749440
+    },
+    {
+      "config": "configs/baseline/fair/strip_rcnn_s.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 45157893,
+      "trainable": 45157893
+    },
+    {
+      "config": "configs/baseline/hrsc/lsknet_s.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 30962712,
+      "trainable": 30962712
+    },
+    {
+      "config": "configs/baseline/hrsc/orcnn_r50.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 41350748,
+      "trainable": 41125404
+    },
+    {
+      "config": "configs/baseline/hrsc/pkinet_v2_s.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 30712540,
+      "trainable": 30712540
+    },
+    {
+      "config": "configs/baseline/hrsc/strip_rcnn_s.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 45120993,
+      "trainable": 45120993
+    },
+    {
+      "config": "configs/frozen/dota/lsknet_s_faa_12e.py",
+      "classes": 15,
+      "epochs": 12,
+      "parameters": 34582697,
+      "trainable": 131970
+    },
+    {
+      "config": "configs/frozen/dota/lsknet_s_faa_36e.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 34582697,
+      "trainable": 131970
+    },
+    {
+      "config": "configs/frozen/dota/pkinet_v2_s_12e.py",
+      "classes": 15,
+      "epochs": 12,
+      "parameters": 30858860,
+      "trainable": 131970
+    },
+    {
+      "config": "configs/frozen/dota/pkinet_v2_s_36e.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 30858860,
+      "trainable": 131970
+    },
+    {
+      "config": "configs/nif/dior/lsknet_s.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 31114157,
+      "trainable": 31114157
+    },
+    {
+      "config": "configs/nif/dior/orcnn_r50.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 41502193,
+      "trainable": 41276849
+    },
+    {
+      "config": "configs/nif/dior/pkinet_v2_s.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 30863985,
+      "trainable": 30863985
+    },
+    {
+      "config": "configs/nif/dior/strip_rcnn_s.py",
+      "classes": 20,
+      "epochs": 12,
+      "parameters": 45272438,
+      "trainable": 45272438
+    },
+    {
+      "config": "configs/nif/dota/lsknet_s.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 31109032,
+      "trainable": 31109032
+    },
+    {
+      "config": "configs/nif/dota/orcnn_r50.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 41497068,
+      "trainable": 41271724
+    },
+    {
+      "config": "configs/nif/dota/pkinet_v2_s.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 30858860,
+      "trainable": 30858860
+    },
+    {
+      "config": "configs/nif/dota/strip_rcnn_s.py",
+      "classes": 15,
+      "epochs": 36,
+      "parameters": 45267313,
+      "trainable": 45267313
+    },
+    {
+      "config": "configs/nif/fair/lsknet_s.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 31131582,
+      "trainable": 31131582
+    },
+    {
+      "config": "configs/nif/fair/orcnn_r50.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 41519618,
+      "trainable": 41294274
+    },
+    {
+      "config": "configs/nif/fair/pkinet_v2_s.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 30881410,
+      "trainable": 30881410
+    },
+    {
+      "config": "configs/nif/fair/strip_rcnn_s.py",
+      "classes": 37,
+      "epochs": 12,
+      "parameters": 45289863,
+      "trainable": 45289863
+    },
+    {
+      "config": "configs/nif/hrsc/lsknet_s.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 31094682,
+      "trainable": 31094682
+    },
+    {
+      "config": "configs/nif/hrsc/orcnn_r50.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 41482718,
+      "trainable": 41257374
+    },
+    {
+      "config": "configs/nif/hrsc/pkinet_v2_s.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 30844510,
+      "trainable": 30844510
+    },
+    {
+      "config": "configs/nif/hrsc/strip_rcnn_s.py",
+      "classes": 1,
+      "epochs": 36,
+      "parameters": 45252963,
+      "trainable": 45252963
+    }
+  ],
+  "environment": {
+    "python": "3.9",
+    "torch": "1.13.1+cu117",
+    "mmcv": "1.7.0",
+    "mmdet": "2.28.2",
+    "timm": "1.0.29",
+    "o2_mmcv": "2.1.0",
+    "o2_mmdet": "3.3.0",
+    "mmengine": "0.10.7"
+  },
+  "scope": "Small integration checks, not a rerun of the full accuracy benchmarks.",
+  "submission_formats": {
+    "dota": {
+      "valid": true,
+      "files": 15,
+      "dataset_scope": "one-image smoke check"
+    },
+    "fair": {
+      "valid": true,
+      "files": 1,
+      "dataset_scope": "one-image smoke check"
+    },
+    "yolo": {
+      "valid": true,
+      "files": 15,
+      "dataset_scope": "one-image smoke check"
+    },
+    "o2": {
+      "valid": true,
+      "files": 15,
+      "dataset_scope": "one-image smoke check"
+    }
+  },
+  "distributed_yolo": {
+    "world_size": 4,
+    "global_batch": 8,
+    "per_gpu_batch": 2,
+    "epochs": 1,
+    "iterations": 1,
+    "validation_completed": true,
+    "checkpoint_reload_completed": true
+  },
+  "distributed_o2": {
+    "world_size": 4,
+    "global_batch": 8,
+    "per_gpu_batch": 2,
+    "epochs": 1,
+    "iterations": 1,
+    "completed": true
+  },
+  "release_audit": {
+    "readme_dataset_tables": 4,
+    "weight_mirrors": 28,
+    "local_links_valid": true,
+    "model_labels_valid": true,
+    "syntax_valid": true,
+    "no_research_data_or_checkpoints": true
+  }
+}

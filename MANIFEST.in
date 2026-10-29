@@ -1,0 +1,11 @@
+include README.md LICENSE TRAINING_COMMANDS.txt
+recursive-include configs *.py
+recursive-include data *.py *.json *.sh *.md
+recursive-include adapters *.py *.txt
+recursive-include third_party *
+recursive-include tools *.py *.sh
+recursive-include scripts *.sh
+recursive-include docs *.md *.json *.png
+global-exclude *.pyc
+prune work_dirs
+prune pretrained

@@ -1,0 +1,165 @@
+# NIF training commands
+# Run from the NIF repository root. Activate the matching environment.
+export NIF_DATA_ROOT=${NIF_DATA_ROOT:-$PWD/data}
+export NIF_PRETRAIN_ROOT=${NIF_PRETRAIN_ROOT:-$PWD/pretrained}
+export NIF_WORK_ROOT=${NIF_WORK_ROOT:-$PWD/work_dirs}
+# MMRotate: AdamW lr=0.0001; 2 images/GPU; no automatic LR scaling.
+
+# dota / baseline / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dota/lsknet_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dota/lsknet_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dota / baseline / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dota/orcnn_r50.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dota/orcnn_r50.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dota / baseline / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dota/pkinet_v2_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dota/pkinet_v2_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dota / baseline / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dota/strip_rcnn_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dota/strip_rcnn_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dota / nif / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dota/lsknet_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dota/lsknet_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dota / nif / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dota/orcnn_r50.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dota/orcnn_r50.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dota / nif / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dota/pkinet_v2_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dota/pkinet_v2_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dota / nif / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dota/strip_rcnn_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_dota"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dota/strip_rcnn_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_dota_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / baseline / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/fair/lsknet_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/fair/lsknet_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / baseline / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/fair/orcnn_r50.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/fair/orcnn_r50.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / baseline / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/fair/pkinet_v2_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/fair/pkinet_v2_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / baseline / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/fair/strip_rcnn_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/fair/strip_rcnn_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / nif / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/fair/lsknet_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/fair/lsknet_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / nif / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/fair/orcnn_r50.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/fair/orcnn_r50.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / nif / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/fair/pkinet_v2_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/fair/pkinet_v2_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# fair / nif / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/fair/strip_rcnn_s.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_fair"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/fair/strip_rcnn_s.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_fair_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / baseline / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dior/lsknet_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dior/lsknet_s.py 4 --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / baseline / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dior/orcnn_r50.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dior/orcnn_r50.py 4 --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / baseline / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dior/pkinet_v2_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dior/pkinet_v2_s.py 4 --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / baseline / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/dior/strip_rcnn_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/dior/strip_rcnn_s.py 4 --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / nif / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dior/lsknet_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dior/lsknet_s.py 4 --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / nif / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dior/orcnn_r50.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dior/orcnn_r50.py 4 --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / nif / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dior/pkinet_v2_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dior/pkinet_v2_s.py 4 --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# dior / nif / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/dior/strip_rcnn_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_dior"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/dior/strip_rcnn_s.py 4 --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_dior_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / baseline / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/hrsc/lsknet_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/hrsc/lsknet_s.py 4 --work-dir "$NIF_WORK_ROOT/baseline_lsknet_s_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / baseline / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/hrsc/orcnn_r50.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/hrsc/orcnn_r50.py 4 --work-dir "$NIF_WORK_ROOT/baseline_orcnn_r50_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / baseline / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/hrsc/pkinet_v2_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/hrsc/pkinet_v2_s.py 4 --work-dir "$NIF_WORK_ROOT/baseline_pkinet_v2_s_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / baseline / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/baseline/hrsc/strip_rcnn_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/baseline/hrsc/strip_rcnn_s.py 4 --work-dir "$NIF_WORK_ROOT/baseline_strip_rcnn_s_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / nif / lsknet_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/hrsc/lsknet_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/hrsc/lsknet_s.py 4 --work-dir "$NIF_WORK_ROOT/nif_lsknet_s_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / nif / orcnn_r50
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/hrsc/orcnn_r50.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/hrsc/orcnn_r50.py 4 --work-dir "$NIF_WORK_ROOT/nif_orcnn_r50_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / nif / pkinet_v2_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/hrsc/pkinet_v2_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/hrsc/pkinet_v2_s.py 4 --work-dir "$NIF_WORK_ROOT/nif_pkinet_v2_s_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# hrsc / nif / strip_rcnn_s
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/nif/hrsc/strip_rcnn_s.py --seed 0 --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_hrsc"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/nif/hrsc/strip_rcnn_s.py 4 --work-dir "$NIF_WORK_ROOT/nif_strip_rcnn_s_hrsc_4gpu" --cfg-options data.samples_per_gpu=2
+
+# Frozen DOTA / lsknet_s_faa_12e
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/frozen/dota/lsknet_s_faa_12e.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_lsknet_s_faa_12e"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/frozen/dota/lsknet_s_faa_12e.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_lsknet_s_faa_12e_4gpu" --cfg-options data.samples_per_gpu=2
+
+# Frozen DOTA / lsknet_s_faa_36e
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/frozen/dota/lsknet_s_faa_36e.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_lsknet_s_faa_36e"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/frozen/dota/lsknet_s_faa_36e.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_lsknet_s_faa_36e_4gpu" --cfg-options data.samples_per_gpu=2
+
+# Frozen DOTA / pkinet_v2_s_12e
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/frozen/dota/pkinet_v2_s_12e.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_pkinet_v2_s_12e"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/frozen/dota/pkinet_v2_s_12e.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_pkinet_v2_s_12e_4gpu" --cfg-options data.samples_per_gpu=2
+
+# Frozen DOTA / pkinet_v2_s_36e
+CUDA_VISIBLE_DEVICES=0 python -u tools/train.py configs/frozen/dota/pkinet_v2_s_36e.py --seed 0 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_pkinet_v2_s_36e"
+CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29600 bash tools/dist_train.sh configs/frozen/dota/pkinet_v2_s_36e.py 4 --no-validate --work-dir "$NIF_WORK_ROOT/frozen_pkinet_v2_s_36e_4gpu" --cfg-options data.samples_per_gpu=2
+
+# YOLO26-L OBB: frozen official detector, train/val splits, global batch 32.
+python adapters/ultralytics/train.py --model "$NIF_PRETRAIN_ROOT/yolo26l-obb.pt" --data "$NIF_DATA_ROOT/yolo_dota10/DOTA10_nif.yaml" --device 0,1,2,3 --batch 32 --epochs 50 --val-interval 1 --max-det 700 --project "$NIF_WORK_ROOT/yolo_nif" --name train
+# Two images per GPU: replace --batch 32 with --batch 8.
+# Single GPU with batch 2:
+python adapters/ultralytics/train.py --model "$NIF_PRETRAIN_ROOT/yolo26l-obb.pt" --data "$NIF_DATA_ROOT/yolo_dota10/DOTA10_nif.yaml" --device 0 --batch 2 --epochs 50 --val-interval 1 --max-det 700 --project "$NIF_WORK_ROOT/yolo_nif_single" --name train
+
+# O2-RTDETR: activate the separate MMCV 2 / MMDetection 3 environment.
+export NIF_O2_CHECKPOINT="$NIF_PRETRAIN_ROOT/epoch_72.pth"
+CUDA_VISIBLE_DEVICES=0 python adapters/o2_rtdetr/run.py train adapters/o2_rtdetr/configs/frozen_dota_12e.py --work-dir "$NIF_WORK_ROOT/o2_nif_12e"
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 --master_port=29601 adapters/o2_rtdetr/run.py train adapters/o2_rtdetr/configs/frozen_dota_12e.py --launcher pytorch --work-dir "$NIF_WORK_ROOT/o2_nif_12e_4gpu"
+
+CUDA_VISIBLE_DEVICES=0 python adapters/o2_rtdetr/run.py train adapters/o2_rtdetr/configs/frozen_dota_36e.py --work-dir "$NIF_WORK_ROOT/o2_nif_36e"
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 --master_port=29601 adapters/o2_rtdetr/run.py train adapters/o2_rtdetr/configs/frozen_dota_36e.py --launcher pytorch --work-dir "$NIF_WORK_ROOT/o2_nif_36e_4gpu"
+

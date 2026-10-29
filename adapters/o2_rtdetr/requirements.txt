@@ -1,0 +1,7 @@
+mmengine==0.10.7
+mmdet==3.3.0
+mmsegmentation==1.2.2
+termcolor
+ftfy
+regex
+wcwidth

@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+work_dirs/
+pretrained/
+*.pth
+*.pth.tar
+*.pt
+*.zip
+*.cache
