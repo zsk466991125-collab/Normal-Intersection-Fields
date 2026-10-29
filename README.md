@@ -19,7 +19,7 @@ final postprocessing. The carrier's prediction head and class scores are retaine
 
 This repository contains the final NIF implementation, four-dataset training
 configs, frozen-detector experiments, and bundled Ultralytics and O2-RTDETR
-runtimes. It contains no datasets, checkpoints, or training dashboard.
+runtimes.
 
 <p align="center">
   <img src="docs/figures/framework.png" alt="NIF framework" width="100%">
@@ -57,7 +57,6 @@ Native multiscale preparation and testing use rates 0.5/1.0/1.5,
 | Oriented R-CNN + NIF | 46.36 | [config](configs/baseline/fair/orcnn_r50.py) | [config](configs/nif/fair/orcnn_r50.py) | [pth](https://pan.baidu.com/s/19XQokxU9-heel2YPqnt9bA?pwd=xnzp) | [pth](https://ttttt.link/f/6ae1a81e16acb) |
 | LSKNet-S + NIF | 48.13 | [config](configs/baseline/fair/lsknet_s.py) | [config](configs/nif/fair/lsknet_s.py) | [pth](https://pan.baidu.com/s/1tDeMNkVJ2JOEvZNvc5jO5Q?pwd=t9vc) | [pth](https://ttttt.link/f/6ae1a7965c8b0) |
 | Strip R-CNN + NIF | 48.22 | [config](configs/baseline/fair/strip_rcnn_s.py) | [config](configs/nif/fair/strip_rcnn_s.py) | [pth](https://pan.baidu.com/s/1QIzWC3-MvLi_EP9T7XaVvQ?pwd=uux9) | [pth](https://ttttt.link/f/6ae1a887138dc) |
-| PKINet-v2-S + NIF | — | [config](configs/baseline/fair/pkinet_v2_s.py) | [config](configs/nif/fair/pkinet_v2_s.py) | — | — |
 
 ### DIOR-R
 
@@ -69,7 +68,6 @@ starts at epoch 9; the best checkpoint is recorded by the native evaluator.
 | Oriented R-CNN + NIF | 66.06 | [config](configs/baseline/dior/orcnn_r50.py) | [config](configs/nif/dior/orcnn_r50.py) | — | — |
 | LSKNet-S + NIF | 68.19 | [config](configs/baseline/dior/lsknet_s.py) | [config](configs/nif/dior/lsknet_s.py) | [pth](https://pan.baidu.com/s/1sH99GD6xXG9QQ7QUJRZKSg?pwd=f56k) | [pth](https://ttttt.link/f/6ae1a79660880) |
 | Strip R-CNN + NIF | 67.43 | [config](configs/baseline/dior/strip_rcnn_s.py) | [config](configs/nif/dior/strip_rcnn_s.py) | [pth](https://pan.baidu.com/s/1Sj6_L0mzdGBe39m31pSkEg?pwd=5peh) | [pth](https://ttttt.link/f/6ae1a8986ba84) |
-| PKINet-v2-S + NIF | — | [config](configs/baseline/dior/pkinet_v2_s.py) | [config](configs/nif/dior/pkinet_v2_s.py) | — | — |
 
 ### HRSC2016
 
