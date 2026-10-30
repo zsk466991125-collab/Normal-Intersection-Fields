@@ -10,6 +10,8 @@
   <sup>*</sup>Corresponding author
 </p>
 
+<p><a href="https://arxiv.org/abs/2610.39715">Paper (arXiv)</a></p>
+
 </div>
 
 NIF is a plug-in geometric refinement branch. Given coarse oriented boxes and
